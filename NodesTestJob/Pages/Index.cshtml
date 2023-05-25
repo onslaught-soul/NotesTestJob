@@ -1,0 +1,79 @@
+﻿@page
+@using Newtonsoft.Json;
+@model IndexModel
+@{
+    ViewData["Title"] = "NoteManager";
+}
+
+<div id="card">
+    @if (ViewData["ErrorMessage"] != null)
+    {
+        <div class="error">
+            <h1>Ошибка в процессе создания БД</h1>
+            <p>@ViewData["ErrorMessage"]</p>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function getData() {
+            const cardContainer = document.getElementById("card");
+
+            const notesJson = @Json.Serialize(Model.Notes);
+            const notes = JSON.parse(notesJson);
+            notes.forEach(note => {
+                const card = document.createElement("div");
+                card.className = note.IsChecked ? "card" : "card notCheck";
+                card.id = note.Id;
+                card.addEventListener('click', function () {
+                    if (!note.IsChecked) {
+                        checkNote(this);
+                    }
+                });
+
+                const cardBtn = document.createElement("div");
+                cardBtn.className = "card-btn";
+
+                const input = document.createElement("input");
+                input.className = "card-btn-input";
+                input.type = "button";
+                input.value = "X";
+                input.addEventListener('click', function () {
+                    deleteNote(this);
+                });
+
+                const cardBody = document.createElement("div");
+                cardBody.className = "card-body";
+
+                const title = document.createElement("h5");
+                title.className = "card-title";
+                title.textContent = note.Title;
+                title.addEventListener("dblclick", function () {
+                    startEditingH5(this);
+                });
+
+                const content = document.createElement("p");
+                content.className = "card-text";
+                content.textContent = note.Text;
+                content.addEventListener("dblclick", function () {
+                    startEditingP(this);
+                });
+
+                const date = document.createElement("p");
+                date.className = "card-date";
+                date.textContent = note.ChangeDate;
+
+                cardBtn.appendChild(input);
+                cardBody.appendChild(title);
+                cardBody.appendChild(content);
+                cardBody.appendChild(date);
+                card.appendChild(cardBtn);
+                card.appendChild(cardBody);
+
+                cardContainer.appendChild(card);
+            });
+        }
+        getData();
+    </script>
+}
